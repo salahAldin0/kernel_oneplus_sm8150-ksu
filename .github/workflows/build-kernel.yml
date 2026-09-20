@@ -33,12 +33,11 @@ jobs:
 
       - name: Setup Android Clang (r547379)
         run: |
-          mkdir -p $HOME/android-clang/clang-r547379
-          sudo mkdir -p /root/android-clang/clang-r547379
-          curl -sL "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz" -o clang.tar.gz
-          tar -xzf clang.tar.gz -C $HOME/android-clang/clang-r547379
-          sudo cp -r $HOME/android-clang/clang-r547379/* /root/android-clang/clang-r547379/
-          rm -f clang.tar.gz
+          mkdir -p $HOME/android-clang
+          sudo mkdir -p /root/android-clang
+          echo "Cloning official Clang r547379..."
+          git clone --depth=1 https://gitlab.com/alphadroid-project/prebuilts_clang_host_linux-x86_clang-r547379.git $HOME/android-clang/clang-r547379
+          sudo cp -r $HOME/android-clang/clang-r547379 /root/android-clang/
           echo "Clang version:"
           $HOME/android-clang/clang-r547379/bin/clang --version
 
