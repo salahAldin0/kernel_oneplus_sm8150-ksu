@@ -41,6 +41,15 @@ jobs:
           echo "Clang version:"
           $HOME/android-clang/clang-r547379/bin/clang --version
 
+      - name: Restore SukiSU Manager Component
+        run: |
+          echo "Restoring manager component into KernelSU/kernel/..."
+          git clone --depth=1 -b builtin https://github.com/SukiSU-Ultra/SukiSU-Ultra /tmp/sukisu
+          mkdir -p KernelSU/kernel/manager
+          cp -r /tmp/sukisu/kernel/manager/* KernelSU/kernel/manager/
+          sed -i 's/#define MASK_SYSTEM (FS_CREATE | FS_MOVE | FS_EVENT_ON_CHILD)/#define MASK_SYSTEM (FS_CREATE | FS_MOVE | FS_EVENT_ON_CHILD | FS_MODIFY | FS_CLOSE_WRITE)/' KernelSU/kernel/manager/pkg_observer.c
+          ls -la KernelSU/kernel/manager/
+
       - name: Compile Kernel
         run: |
           export ARCH=arm64
