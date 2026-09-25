@@ -44,6 +44,24 @@ static inline void ksu_susfs_add_open_redirect(void __user **p)
 #endif
 }
 
+static inline void ksu_susfs_show_version(void __user **p)
+{
+	char ver[] = "v1.5.5";
+	copy_to_user((void __user *)*p, ver, sizeof(ver));
+}
+
+static inline void ksu_susfs_show_variant(void __user **p)
+{
+	char var[] = "non-gki";
+	copy_to_user((void __user *)*p, var, sizeof(var));
+}
+
+static inline void ksu_susfs_get_enabled_features(void __user **p)
+{
+	char feat[] = "CONFIG_KSU_SUSFS_SUS_PATH\nCONFIG_KSU_SUSFS_SUS_MOUNT\nCONFIG_KSU_SUSFS_SUS_KSTAT\nCONFIG_KSU_SUSFS_OPEN_REDIRECT\nCONFIG_KSU_SUSFS_SPOOF_UNAME\nCONFIG_KSU_SUSFS_ENABLE_LOG\n";
+	copy_to_user((void __user *)*p, feat, sizeof(feat));
+}
+
 /* Map dispatch.c calls to our typed wrappers */
 #define susfs_add_sus_path(p)                    ksu_susfs_add_sus_path(p)
 #define susfs_add_sus_path_loop(p)               do {} while(0)
@@ -56,9 +74,9 @@ static inline void ksu_susfs_add_open_redirect(void __user **p)
 #define susfs_add_open_redirect(p)               ksu_susfs_add_open_redirect(p)
 #define susfs_add_sus_map(p)                     do {} while(0)
 #define susfs_set_avc_log_spoofing(p)            do {} while(0)
-#define susfs_get_enabled_features(p)            do {} while(0)
-#define susfs_show_variant(p)                    do {} while(0)
-#define susfs_show_version(p)                    do {} while(0)
+#define susfs_get_enabled_features(p)            ksu_susfs_get_enabled_features(p)
+#define susfs_show_variant(p)                    ksu_susfs_show_variant(p)
+#define susfs_show_version(p)                    ksu_susfs_show_version(p)
 #define susfs_start_sdcard_monitor_fn()          do {} while(0)
 
 #endif /* KSU_SUSFS_COMPAT_H */
