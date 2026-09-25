@@ -165,10 +165,35 @@ int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
                         flags);
 }
 
+__attribute__((hot)) static __always_inline bool __ksu_is_su_allowed(const void **ptr_to_check)
+{
+    if (!ksu_su_compat_enabled)
+        return false;
+
+    if (likely(test_thread_flag(TIF_SECCOMP)))
+        return false;
+
+    if (!ksu_is_allow_uid_for_current(current_uid().val) &&
+        !is_uid_manager(current_uid().val))
+        return false;
+
+    if (unlikely(!ptr_to_check))
+        return false;
+
+    if (unlikely(!*ptr_to_check))
+        return false;
+
+    return true;
+}
+#define ksu_check_su_allowed(ptr) (__ksu_is_su_allowed((const void **)ptr))
+
 int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
              int *__unused_flags)
 {
     char path[sizeof(su_path) + 1] = {0};
+
+    if (!ksu_check_su_allowed(filename_user))
+        return 0;
 
     strncpy_from_user(path, *filename_user, sizeof(path));
 
@@ -199,6 +224,9 @@ int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags)
         return 0;
 
     char path[sizeof(su_path) + 1] = {0};
+
+    if (!ksu_check_su_allowed(filename_user))
+        return 0;
 
     strncpy_from_user(path, *filename_user, sizeof(path));
 
