@@ -170,20 +170,14 @@ __attribute__((hot)) static __always_inline bool __ksu_is_su_allowed(const void 
     if (!ksu_su_compat_enabled)
         return false;
 
-    if (likely(test_thread_flag(TIF_SECCOMP)))
+    if (unlikely(!ptr_to_check || !*ptr_to_check))
         return false;
 
-    if (!ksu_is_allow_uid_for_current(current_uid().val) &&
-        !is_uid_manager(current_uid().val))
-        return false;
+    if (ksu_is_allow_uid_for_current(current_uid().val) ||
+        is_uid_manager(current_uid().val))
+        return true;
 
-    if (unlikely(!ptr_to_check))
-        return false;
-
-    if (unlikely(!*ptr_to_check))
-        return false;
-
-    return true;
+    return false;
 }
 #define ksu_check_su_allowed(ptr) (__ksu_is_su_allowed((const void **)ptr))
 
